@@ -1,0 +1,11 @@
+<div class="alertes-container">
+  <h3>Alertes</h3>
+  <ul class="list-group">
+    <li *ngFor="let alerte of alertes" 
+        class="list-group-item d-flex justify-content-between align-items-center"
+        [ngClass]="{'list-group-item-warning': !alerte.lue}">
+      <span>{{ alerte.message }}</span>
+      <button class="btn btn-sm btn-success" *ngIf="!alerte.lue" (click)="marquerLue(alerte)">Marquer comme lue</button>
+    </li>
+  </ul>
+</div>

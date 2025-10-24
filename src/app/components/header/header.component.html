@@ -1,0 +1,144 @@
+<header class="app-header d-flex align-items-center justify-content-between px-4 py-3 shadow-sm">
+  <!-- Logo / Titre -->
+  <div class="d-flex align-items-center">
+    <i class="bi bi-car-front-fill fs-3 text-primary me-2 logo-icon"></i>
+    <span class="h5 mb-0 fw-bold text-white">Ny Havana Gestion Parc Auto</span>
+  </div>
+
+  <!-- Actions utilisateur -->
+  <div class="d-flex align-items-center gap-3">
+    <!-- Notifications -->
+    <button class="btn btn-light position-relative notification-btn" 
+            type="button"
+            (click)="toggleAlertesPanel()">
+      <i class="bi bi-bell fs-5"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate-badge"
+        *ngIf="alertesNonLues > 0">
+        {{ alertesNonLues }}
+        <span class="visually-hidden">notifications</span>
+      </span>
+    </button>
+
+    <!-- Profil Utilisateur -->
+    <button class="btn btn-light d-flex align-items-center gap-2 profile-btn"
+            type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasProfile" aria-controls="offcanvasProfile">
+      <i class="bi bi-person-circle fs-5 profile-icon"></i>
+      <span class="fw-semibold username-text">{{ username }}</span>
+    </button>
+  </div>
+</header>
+
+<!-- PANEL DES ALERTES -->
+<div class="alertes-panel" [class.show]="showAlertesPanel">
+  <div class="alertes-panel-header d-flex justify-content-between align-items-center p-3 border-bottom">
+    <h5 class="mb-0 fw-bold text-dark">
+      <i class="bi bi-bell-fill text-warning me-2"></i>
+      Alertes ({{ alertesNonLues }})
+    </h5>
+    <button type="button" class="btn-close" (click)="closeAlertesPanel()" aria-label="Fermer"></button>
+  </div>
+
+  <div class="alertes-panel-body">
+    <div class="alertes-list">
+      <div *ngFor="let a of alertes" 
+           class="alerte-item p-3 border-bottom"
+           [class.alerte-non-lue]="!a.lue"
+           [class.alerte-lue]="a.lue">
+        
+        <div class="d-flex align-items-start">
+          <div class="alerte-icon me-3">
+            <i class="bi fs-5" 
+               [ngClass]="{'bi-exclamation-triangle-fill text-danger': !a.lue, 
+                          'bi-check-circle-fill text-success': a.lue}"></i>
+          </div>
+          
+          <div class="flex-grow-1">
+            <h6 class="mb-1 fw-semibold">{{ a.message }}</h6>
+            <small class="text-muted d-block">
+              <i class="bi bi-clock me-1"></i>
+              {{ a.createdAt | date:'dd/MM/yyyy à HH:mm' }}
+            </small>
+            <small class="text-muted" *ngIf="a.vehicule">
+              <i class="bi bi-truck me-1"></i>
+              {{ a.vehicule.immatriculation }}
+            </small>
+          </div>
+          
+          <div class="alerte-actions ms-2">
+            <button class="btn btn-success btn-sm" 
+                    *ngIf="!a.lue" 
+                    (click)="marquerAlerteLue(a)"
+                    title="Marquer comme lue">
+              <i class="bi bi-check-lg"></i>
+            </button>
+            <span class="badge bg-success" *ngIf="a.lue">
+              <i class="bi bi-check2-all"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="alertes.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-check2-all display-4 d-block mb-2 opacity-50"></i>
+        <h6 class="fw-semibold">Aucune alerte</h6>
+        <p class="small mb-0">Toutes les alertes sont traitées</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alertes-panel-footer p-3 border-top bg-light">
+    <button class="btn btn-outline-primary btn-sm w-100" (click)="marquerToutesLues()" [disabled]="alertesNonLues === 0">
+      <i class="bi bi-check2-all me-1"></i>
+      Tout marquer comme lu
+    </button>
+  </div>
+</div>
+
+<!-- Overlay pour fermer le panel -->
+<div class="alertes-overlay" [class.show]="showAlertesPanel" (click)="closeAlertesPanel()"></div>
+
+<!-- OFFCANVAS PROFESSIONNEL -->
+<div class="offcanvas offcanvas-end user-panel" tabindex="-1" id="offcanvasProfile" aria-labelledby="offcanvasProfileLabel">
+  <div class="offcanvas-header border-0">
+    <h5 class="offcanvas-title text-primary fw-bold" id="offcanvasProfileLabel">Mon Profil</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <!-- Avatar & Nom -->
+    <div class="text-center mb-4">
+      <div class="avatar-wrapper mx-auto mb-3">
+        <i class="bi bi-person-fill text-white fs-2"></i>
+      </div>
+      <h5 class="fw-bold mb-0">{{ userInfo.username }}</h5>
+      <span class="text-muted small">{{ userInfo.role }}</span>
+    </div>
+
+    <hr>
+
+    <!-- Informations utilisateur -->
+    <div class="info-section mb-4">
+      <h6 class="text-primary fw-semibold mb-3"><i class="bi bi-info-circle me-2"></i>Informations</h6>
+      <ul class="list-unstyled ps-1">
+        <li class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> {{ userInfo.email }}</li>
+        <li class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> {{ userInfo.phone }}</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- Actions -->
+    <div class="action-section">
+      <h6 class="text-primary fw-semibold mb-3"><i class="bi bi-gear me-2"></i>Actions</h6>
+      <button class="btn btn-outline-primary w-100 mb-2">
+        <i class="bi bi-pencil-square me-2"></i> Modifier le profil
+      </button>
+      <button class="btn btn-outline-secondary w-100 mb-2" data-bs-dismiss="offcanvas">
+        <i class="bi bi-x-circle me-2"></i> Fermer
+      </button>
+      <button class="btn btn-danger w-100" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-2"></i> Se déconnecter
+      </button>
+    </div>
+  </div>
+</div>

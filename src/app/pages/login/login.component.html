@@ -1,0 +1,45 @@
+<div class="login-page d-flex justify-content-center align-items-center vh-100">
+  <div class="login-card shadow-lg p-4 rounded">
+    <div class="text-center mb-4">
+      <i class="bi bi-car-front-fill fs-1 text-primary"></i>
+      <h2 class="mt-2 fw-bold">GPA</h2>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="username" class="form-label">Nom d'utilisateur</label>
+        <input type="text" id="username" name="username" [(ngModel)]="username"
+               class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Mot de passe</label>
+        <input type="password" id="password" name="password" [(ngModel)]="password"
+               class="form-control" required>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger py-2">
+        {{ error }}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+    </form>
+
+    <div class="text-center mt-3 text-muted small">
+      &copy; 2025 GPA
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="login-container">
+  <h2>Connexion</h2>
+  <form (ngSubmit)="onSubmit()">
+    <input [(ngModel)]="username" name="username" placeholder="Nom d'utilisateur" required />
+    <input [(ngModel)]="password" name="password" type="password" placeholder="Mot de passe" required />
+    <button type="submit">Se connecter</button>
+    @if (error) {
+        <p class="error">{{ error }}</p>
+    }
+  </form>
+</div> -->

@@ -1,0 +1,52 @@
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column">
+
+  <!-- Header -->
+  <div class="sidebar-header d-flex align-items-center px-4 py-3">
+    <i class="bi bi-car-front-fill text-primary fs-3"></i>
+    <span class="app-name ms-2 fw-bold fs-5">GPA</span>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav flex-grow-1">
+    <ul class="nav flex-column">
+      @for (item of menuItems; track item.path) {
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center px-4 py-2" [routerLink]="item.path" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/accueil' }">
+          <i class="bi me-2 fs-5" [class]="'bi-' + item.icon"></i>
+          <span class="link-text">{{ item.label }}</span>
+        </a>
+      </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer d-flex align-items-center px-4 py-3">
+    <button class="btn btn-logout d-flex align-items-center w-100 justify-content-center py-2" type="button"
+      (click)="openLogoutModal()">
+      <i class="bi bi-box-arrow-right me-2 fs-5"></i>
+      Se déconnecter
+    </button>
+  </div>
+</div>
+
+<!-- Modal de confirmation Bootstrap -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Confirmer la déconnexion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir vous déconnecter ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmLogout()">Se déconnecter</button>
+      </div>
+    </div>
+  </div>
+</div>

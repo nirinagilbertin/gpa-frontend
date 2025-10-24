@@ -1,0 +1,141 @@
+<div class="container mt-4">
+  <div class="page-header mb-4">
+    <h1 class="h2 fw-bold">Tableau de Bord</h1>
+    <!-- <p class="text-muted mb-0">Vue d'ensemble de votre parc automobile</p> -->
+  </div>
+
+  <!-- Cartes Statistiques -->
+  <div class="row g-3 mb-4">
+    <!-- Total Dépenses -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted mb-2">Total Dépenses</h6>
+              <h3 class="fw-bold text-primary">{{ totalDepensesMois | number:'1.0-0' }} Ar</h3>
+              <span class="badge bg-success">Ce mois</span>
+            </div>
+            <div class="icon-container bg-primary">
+              <i class="bi bi-cash-stack text-white fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Total Véhicules -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted mb-2">Total Véhicules</h6>
+              <h3 class="fw-bold text-primary">{{ totalVehicules }}</h3>
+              <span class="badge bg-success">En service</span>
+            </div>
+            <div class="icon-container bg-primary">
+              <i class="bi bi-truck text-white fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Total Conducteurs -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted mb-2">Nombre conducteurs</h6>
+              <h3 class="fw-bold text-primary">{{ totalConducteur }}</h3>
+              <span class="badge bg-success">En services</span>
+            </div>
+            <div class="icon-container bg-primary">
+              <i class="bi bi-person-workspace text-white fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Total Trajets -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted mb-2">Total Trajets</h6>
+              <h3 class="fw-bold text-primary">{{ totalTrajet }}</h3>
+              <span class="badge bg-success">Ce mois</span>
+            </div>
+            <div class="icon-container bg-primary">
+              <i class="bi bi-geo-alt text-white fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique et Dernières Activités -->
+  <div class="row g-4">
+    <!-- Graphique Fréquence Trajets -->
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">Fréquence des Trajets</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas #trajetChart></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dernières Activités -->
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">Dernières Activités</h5>
+        </div>
+        <div class="card-body">
+          <div class="activity-list">
+
+            <div class="activity-item">
+              <div class="activity-icon bg-success">
+                <i class="bi bi-geo-alt text-white"></i>
+              </div>
+              <div class="activity-content">
+                <h6 class="mb-1">Dernier trajet</h6>
+                <p class="text-muted mb-0">{{ dernierTrajet?.motif }}</p>
+                <small class="text-muted">{{ dernierTrajet?.date | date:'shortDate' }} à {{ dernierTrajet?.heure }}</small>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon bg-danger">
+                <i class="bi bi-fuel-pump text-white"></i>
+              </div>
+              <div class="activity-content">
+                <h6 class="mb-1">Dernier plein</h6>
+                <p class="text-muted mb-0">{{ getVehiculeLabel(dernierPlein?.vehicule)}} - {{ dernierPlein?.litre }} L</p>
+                <small class="text-muted">{{ dernierPlein?.date | date:'shortDate' }}</small>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon bg-warning">
+                <i class="bi bi-tools text-white"></i>
+              </div>
+              <div class="activity-content">
+                <h6 class="mb-1">Dernier Entretien</h6>
+                <p class="text-muted mb-0">{{ getVehiculeLabel(dernierEntretien?.vehicule) }} - {{ dernierEntretien?.categorie}}</p>
+                <small class="text-muted">{{ dernierEntretien?.date | date:'shortDate'}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

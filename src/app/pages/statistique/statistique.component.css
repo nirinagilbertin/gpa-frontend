@@ -1,0 +1,62 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --accent-color: #e74c3c;
+  --light-bg: #f8f9fa;
+  --dark-text: #2c3e50;
+}
+
+.dashboard-container {
+  padding: 20px;
+  background-color: var(--light-bg);
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 15px;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-title {
+  color: var(--dark-text);
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+}
+
+/* Animation pour le chargement des graphiques */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.card-body {
+  animation: fadeIn 0.5s ease-in;
+}

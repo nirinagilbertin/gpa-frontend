@@ -1,0 +1,273 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="h2 fw-bold text-dark mb-1">{{ vehicule.marque }} {{ vehicule.modele }}</h1>
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-primary bg-opacity-10 text-primary fs-6">{{ vehicule.immatriculation }}</span>
+        <span class="text-muted fs-6">{{ kmTotal | number:'1.0-0' }} km total</span>
+        <span class="text-muted fs-6">{{ vehicule.kilometreCompteur | number:'1.0-0' }} km actuel</span>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-outline-primary btn-sm" (click)="changerFiltre('mois')" 
+              [class.active]="filtre === 'mois'">
+        Ce mois
+      </button>
+      <button class="btn btn-outline-primary btn-sm" (click)="changerFiltre('annee')" 
+              [class.active]="filtre === 'annee'">
+        Cette année
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Principaux -->
+  <div class="row g-3 mb-5">
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="kpi-card primary">
+        <div class="kpi-icon">
+          <i class="bi bi-speedometer2"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kmAujourdhui | number:'1.0-0' }} km</div>
+          <div class="kpi-label">Aujourd'hui</div>
+          <div class="kpi-trend" [class.positive]="evolutionKm.aujourdhui > 5" 
+                               [class.negative]="evolutionKm.aujourdhui < -5">
+            <i class="bi {{ getEvolutionIcon(evolutionKm.aujourdhui) }}"></i>
+            {{ evolutionKm.aujourdhui > 0 ? '+' : '' }}{{ evolutionKm.aujourdhui | number:'1.1-1' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="kpi-card success">
+        <div class="kpi-icon">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kmCeMois | number:'1.0-0' }} km</div>
+          <div class="kpi-label">Ce mois</div>
+          <div class="kpi-trend" [class.positive]="evolutionKm.moisPrecedent > 5" 
+                               [class.negative]="evolutionKm.moisPrecedent < -5">
+            <i class="bi {{ getEvolutionIcon(evolutionKm.moisPrecedent) }}"></i>
+            {{ evolutionKm.moisPrecedent > 0 ? '+' : '' }}{{ evolutionKm.moisPrecedent | number:'1.1-1' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="kpi-card warning">
+        <div class="kpi-icon">
+          <i class="bi bi-fuel-pump"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ nbPlein }}</div>
+          <div class="kpi-label">Pleins essence</div>
+          <div class="kpi-subtext">{{ filtre === 'mois' ? 'Ce mois' : 'Cette année' }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="kpi-card danger">
+        <div class="kpi-icon">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ coutsTotal | number:'1.0-0' }} Ar</div>
+          <div class="kpi-label">Coût total</div>
+          <div class="kpi-subtext">{{ repartition.carburant | number:'1.0-0' }} Ar carburant</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analyse détaillée -->
+  <div class="row g-4">
+    <!-- Analyse kilométrique -->
+    <div class="col-12 col-lg-8">
+      <div class="card analysis-card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-bar-chart-line me-2"></i>
+            Analyse Kilométrique
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <div class="metric-comparison">
+                <h6 class="metric-title">Performance {{ filtre === 'mois' ? 'mensuelle' : 'annuelle' }}</h6>
+                <div class="comparison-grid">
+                  <div class="comparison-item">
+                    <span class="comparison-label">Période actuelle</span>
+                    <span class="comparison-value">{{ (filtre === 'mois' ? kmCeMois : kmCetteAnnee) | number:'1.0-0' }} km</span>
+                  </div>
+                  <div class="comparison-item">
+                    <span class="comparison-label">Moyenne</span>
+                    <span class="comparison-value">{{ getPerformanceMensuelle().moyenne | number:'1.0-0' }} km</span>
+                  </div>
+                  <div class="comparison-item">
+                    <span class="comparison-label">Écart</span>
+                    <span class="comparison-value" [class.text-success]="getPerformanceMensuelle().ecart > 0" 
+                          [class.text-danger]="getPerformanceMensuelle().ecart < 0">
+                      {{ getPerformanceMensuelle().ecart > 0 ? '+' : '' }}{{ getPerformanceMensuelle().ecart | number:'1.0-0' }} km
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12 col-md-6">
+              <div class="efficiency-stats">
+                <h6 class="metric-title">Efficacité</h6>
+                <div class="efficiency-item">
+                  <div class="efficiency-label">Km/jour moyen</div>
+                  <div class="efficiency-value">{{ getEfficaciteQuotidienne() | number:'1.1-1' }} km</div>
+                </div>
+                <div class="efficiency-item">
+                  <div class="efficiency-label">Trajets/{{ filtre === 'mois' ? 'mois' : 'an' }}</div>
+                  <div class="efficiency-value">{{ nbTrajets }}</div>
+                </div>
+                <div class="efficiency-item">
+                  <div class="efficiency-label">Km/trajet moyen</div>
+                  <div class="efficiency-value">{{ getMoyenneDistance() | number:'1.1-1' }} km</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau des trajets -->
+      <div class="card analysis-card mt-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Analyse des Trajets</h5>
+          <small class="text-muted">{{ trajets.length }} trajets analysés</small>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-analytic">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Distance</th>
+                  <th>Conducteur</th>
+                  <th>Efficacité</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let trajet of trajets; let i = index">
+                  <td>
+                    <div class="date-cell">
+                      <div class="date-main">{{ trajet.date | date:"dd/MM/yyyy" }}</div>
+                      <div class="date-time">{{ trajet.heure }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="distance-cell">
+                      <div class="distance-value">{{ (trajet.distanceParcourue || 0) | number:'1.0-0' }} km</div>
+                      <div class="distance-comparison" 
+                           [class.above-average]="(trajet.distanceParcourue || 0) > getMoyenneDistance()"
+                           [class.below-average]="(trajet.distanceParcourue || 0) < getMoyenneDistance()">
+                        {{ abs((trajet.distanceParcourue || 0) - getMoyenneDistance()) | number:'1.0-0' }} km
+                        {{ (trajet.distanceParcourue || 0) > getMoyenneDistance() ? 'au-dessus' : 'en-dessous' }}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="driver-tag">{{ getConducteurLabel(trajet.conducteur) }}</span>
+                  </td>
+                  <td>
+                    <span class="efficiency-rating" 
+                         [class.high]="getEfficiencyRating(trajet) === 'high'"
+                         [class.medium]="getEfficiencyRating(trajet) === 'medium'"
+                         [class.low]="getEfficiencyRating(trajet) === 'low'">
+                      {{ getEfficiencyRating(trajet) | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class.completed]="trajet.status === 'terminé'"
+                          [class.in-progress]="trajet.status === 'en cours'">
+                      {{ trajet.status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="trajets.length === 0">
+                  <td colspan="5" class="text-center text-muted py-4">
+                    Aucun trajet enregistré pour ce véhicule
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coûts et répartition -->
+    <div class="col-12 col-lg-4">
+      <div class="card analysis-card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Répartition des Coûts</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height: 200px;">
+            <canvas id="repartitionChart"></canvas>
+          </div>
+          
+          <div class="cost-analysis mt-3">
+            <div class="cost-item">
+              <div class="cost-label">Carburant</div>
+              <div class="cost-bar">
+                <div class="cost-progress carburant" 
+                     [style.width.%]="coutsTotal > 0 ? (repartition.carburant / coutsTotal) * 100 : 0"></div>
+              </div>
+              <div class="cost-value">{{ repartition.carburant | number:'1.0-0' }} Ar</div>
+            </div>
+            <div class="cost-item">
+              <div class="cost-label">Entretien</div>
+              <div class="cost-bar">
+                <div class="cost-progress entretien" 
+                     [style.width.%]="coutsTotal > 0 ? (repartition.entretien / coutsTotal) * 100 : 0"></div>
+              </div>
+              <div class="cost-value">{{ repartition.entretien | number:'1.0-0' }} Ar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations véhicule -->
+      <div class="card analysis-card mt-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Informations Véhicule</h5>
+        </div>
+        <div class="card-body">
+          <div class="vehicle-info">
+            <div class="info-item">
+              <span class="info-label">Immatriculation</span>
+              <span class="info-value">{{ vehicule.immatriculation }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Kilométrage actuel</span>
+              <span class="info-value">{{ vehicule.kilometreCompteur | number:'1.0-0' }} km</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Type de carburant</span>
+              <span class="info-value">{{ vehicule.typeCarburant || 'Essence' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Dernier entretien</span>
+              <span class="info-value">
+                {{ getDernierEntretien()?.date ? (getDernierEntretien()?.date | date:'dd/MM/yyyy') : 'Aucun' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="container mt-4">
+
+  <!-- ALERTES -->
+  <div class="mb-5">
+    <h3 class="d-flex align-items-center">
+      Alertes
+      <span class="badge bg-danger ms-2">{{ alertesNonLues }}</span>
+    </h3>
+    <ul class="list-group">
+      <li *ngFor="let a of alertes" class="list-group-item d-flex justify-content-between align-items-center"
+        [ngClass]="{'list-group-item-warning': !a.lue, 'list-group-item-light': a.lue}">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill text-danger me-2" *ngIf="!a.lue"></i>
+          <i class="bi bi-check-circle-fill text-success me-2" *ngIf="a.lue"></i>
+          <span>{{ a.message }}</span>
+        </div>
+        <button class="btn btn-sm btn-success" *ngIf="!a.lue" (click)="marquerAlerteLue(a)">
+          <i class="bi bi-check-lg"></i> Lue
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ENTRETIENS PROGRAMMÉS -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">Entretiens programmés</h3>
+      <button class="btn btn-primary" (click)="openModal()">
+        <i class="bi bi-plus-lg"></i> Nouvel entretien
+      </button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Véhicule</th>
+            <th>Catégorie</th>
+            <th>Condition</th>
+            <th>Date / Kilométrage</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of entretiens">
+            <td>{{ e.vehicule.immatriculation }} - {{ e.vehicule.marque }} {{ e.vehicule.modele }}</td>
+            <td>{{ e.categorie }}</td>
+            <td class="text-capitalize">{{ e.typeCondition }}</td>
+            <td>
+              <span *ngIf="e.typeCondition === 'date'">{{ e.datePrevue | date:'short' }}</span>
+              <span *ngIf="e.typeCondition === 'kilometrage'">{{ e.seuilKilometrage }} km</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                    'bg-warning text-dark': e.statut === 'en_attente',
+                    'bg-success': e.statut === 'terminee',
+                    'bg-info text-dark': e.statut === 'alerte_envoyee'
+                  }">
+                {{ e.statut }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-outline-danger btn-sm" (click)="supprimerEntretien(e)"
+                title="Supprimer l'entretien">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="epModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Créer un entretien programmé</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label">Véhicule</label>
+              <select class="form-select" formControlName="vehiculeId">
+                <option value="">Sélectionner un véhicule</option>
+                <option *ngFor="let v of vehicules" [value]="v._id">
+                  {{ v.immatriculation }} - {{ v.marque }} {{ v.modele }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Catégorie</label>
+              <select class="form-select" formControlName="categorie">
+                <option value="">Sélectionner une catégorie</option>
+                <option *ngFor="let categorie of categories" [value]="categorie">
+                  {{ categorie }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Type de condition</label>
+              <select class="form-select" formControlName="typeCondition">
+                <option value="date">Date</option>
+                <option value="kilometrage">Kilométrage</option>
+              </select>
+            </div>
+
+            <div class="col-md-6" *ngIf="form.get('typeCondition')?.value === 'date'">
+              <label class="form-label">Date prévue</label>
+              <input type="datetime-local" class="form-control" formControlName="datePrevue">
+            </div>
+
+            <div class="col-md-6" *ngIf="form.get('typeCondition')?.value === 'kilometrage'">
+              <label class="form-label">Seuil kilométrage</label>
+              <input type="number" class="form-control" formControlName="seuilKilometrage">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            <i class="bi bi-plus-lg"></i> Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

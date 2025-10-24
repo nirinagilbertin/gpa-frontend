@@ -1,0 +1,70 @@
+/* Fond global - légèrement sombre mais pas trop */
+.login-page {
+  background: #1f2937; /* couleur sidebar */
+}
+
+/* Carte login */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: #2d3748; /* dark card */
+  color: #e5e7eb; /* texte clair */
+  border-radius: 16px;
+  padding: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+/* Labels et texte */
+.login-card h2 {
+  color: #ffffff;
+}
+
+.login-card .form-label {
+  color: #cbd5e1; /* gris clair */
+}
+
+/* Inputs */
+.login-card input.form-control {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+  border-radius: 8px;
+}
+
+.login-card input.form-control:focus {
+  background: #1f2937;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+  color: #e5e7eb;
+}
+
+/* Bouton */
+.login-card .btn-primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  font-weight: 500;
+}
+
+.login-card .btn-primary:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Alert erreur */
+.login-card .alert-danger {
+  background-color: #b91c1c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.login-card .text-muted {
+  color: #94a3b8;
+}

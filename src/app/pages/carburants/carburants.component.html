@@ -1,0 +1,192 @@
+<div class="container mt-4">
+
+  <div class="header-container mb-4">
+    <h2>Gestion du Carburant</h2>
+    <div class="header-actions">
+      <select class="form-select select-period" [(ngModel)]="selectedPeriod" (change)="filterData()">
+        <option value="mois">Ce mois</option>
+        <option value="trimestre">Ce trimestre</option>
+        <option value="annee">Cette année</option>
+      </select>
+      <button class="btn btn-success">
+        <i class="bi bi-printer fs-6"></i>
+      </button>
+      <button class="btn btn-primary" (click)="openModal()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 card-stat">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Coût Total Carburant</small>
+            <h5 class="mt-1">{{ coutTotal | number:'1.0-2' }} Ar</h5>
+          </div>
+          <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+            style="width:50px; height:50px;">
+            <i class="bi bi-cash-stack fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 card-stat">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Nombre de Pleins</small>
+            <h5 class="mt-1">{{ nombrePleins }}</h5>
+          </div>
+          <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+            style="width:50px; height:50px;">
+            <i class="bi bi-ev-station fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 card-stat">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Consommation Moyenne</small>
+            <h5 class="mt-1">{{ consommationMoyenne | number:'1.1-2' }} L / plein</h5>
+          </div>
+          <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
+            style="width:50px; height:50px;">
+            <i class="bi bi-droplet-half fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card shadow-sm border-0 card-stat">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Périodicité Moyenne</small>
+            <h5 class="mt-1">{{ periodiciteMoyenne | number:'1.0-1' }} j</h5>
+          </div>
+          <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+            style="width:50px; height:50px;">
+            <i class="bi bi-clock-history fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card shadow-sm rounded">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Véhicule</th>
+              <th>Conducteur</th>
+              <th>Station</th>
+              <th>Litre</th>
+              <th>Coût total</th>
+              <th>Prix/Litre</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of carburants">
+              <td>{{ c.date | date:'shortDate' }}</td>
+              <td>{{ getVehiculeLabel(c.vehicule) }}</td>
+              <td>{{ getConducteurLabel(c.conducteur) }}</td>
+              <td>{{ c.station }}</td>
+              <td>{{ c.litre }}</td>
+              <td>{{ c.coutTotal | number }}</td>
+              <td>{{ c.prixLitre | number:'1.2-2' }}</td>
+              <td class="d-flex justify-content-center gap-1">
+                <button class="btn btn-outline-warning btn-sm" (click)="openModal(c)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteCarburant(c._id!)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="carburantModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <form [formGroup]="carburantForm" (ngSubmit)="saveCarburant()">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">{{ isEditMode ? 'Modifier' : 'Nouveau' }} Carburant</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+
+            <!-- Date -->
+            <div class="col-md-6">
+              <label>Date</label>
+              <input type="date" class="form-control" formControlName="date" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('date')?.invalid}">
+            </div>
+
+            <!-- Litre -->
+            <div class="col-md-6">
+              <label>Litre</label>
+              <input type="number" class="form-control" formControlName="litre" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('litre')?.invalid}">
+            </div>
+
+            <!-- Coût total -->
+            <div class="col-md-6">
+              <label>Coût total</label>
+              <input type="number" class="form-control" formControlName="coutTotal" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('coutTotal')?.invalid}">
+            </div>
+
+            <!-- Prix/Litre -->
+            <div class="col-md-6">
+              <label>Prix/Litre</label>
+              <input type="number" class="form-control" formControlName="prixLitre" readonly>
+            </div>
+
+            <!-- Station -->
+            <div class="col-md-6">
+              <label>Station</label>
+              <input type="text" class="form-control" formControlName="station" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('station')?.invalid}">
+            </div>
+
+            <!-- Véhicule -->
+            <div class="col-md-6">
+              <label>Véhicule</label>
+              <select class="form-select" formControlName="vehicule" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('vehicule')?.invalid}">
+                <option value="">-- Sélectionner un véhicule --</option>
+                <option *ngFor="let v of vehicules" [value]="v._id">{{ v.marque }} {{ v.immatriculation }}</option>
+              </select>
+            </div>
+
+            <!-- Conducteur -->
+            <div class="col-md-6">
+              <label>Conducteur</label>
+              <select class="form-select" formControlName="conducteur" [ngClass]="{'is-invalid': formSubmitted && carburantForm.get('conducteur')?.invalid}">
+                <option value="">-- Sélectionner un conducteur --</option>
+                <option *ngFor="let c of conducteurs" [value]="c._id">{{ c.nom }} {{ c.prenom }}</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success d-flex align-items-center">
+            <i class="bi bi-check-lg me-1"></i> {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

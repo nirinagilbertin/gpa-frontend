@@ -1,0 +1,64 @@
+<div class="dashboard-container">
+
+  <!-- KPI cards -->
+  <div class="row mb-4 text-center">
+    <div class="col-md-3 mb-2" *ngFor="let kpi of [
+      {label:'Total véhicules', value: totalVehicles, color:'primary'},
+      {label:'Véhicule le plus utilisé', value: mostUsedVehicle, color:'info'},
+      {label:'Véhicule entretien max', value: highestMaintenance, color:'danger'},
+      {label:'Coût total annuel', value: totalAnnualCost+' €', color:'success'}
+    ]">
+      <div class="card shadow-sm p-3 h-100">
+        <h6 class="text-muted">{{kpi.label}}</h6>
+        <h3 class="fw-bold text-{{kpi.color}}">{{kpi.value}}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="row mb-4">
+    <!-- Répartition -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100 p-3">
+        <h5 class="card-title">Répartition du parc</h5>
+        <canvas id="vehicleDistributionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Consommation -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100 p-3">
+        <h5 class="card-title">Consommation de carburant</h5>
+        <canvas id="fuelConsumptionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <!-- Maintenance -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100 p-3">
+        <h5 class="card-title">Coûts de maintenance</h5>
+        <canvas id="maintenanceCostChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Activité -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100 p-3">
+        <h5 class="card-title">Taux d'activité</h5>
+        <canvas id="activityRateChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <!-- TCO -->
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm h-100 p-3">
+        <h5 class="card-title">Coût total de possession (TCO)</h5>
+        <canvas id="totalCostChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

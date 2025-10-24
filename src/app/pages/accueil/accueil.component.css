@@ -1,0 +1,136 @@
+/* --- Cartes Statistiques --- */
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Icônes */
+.icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Graphique */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* --- Liste Activités --- */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+  background-color: #f8f9fa;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-content h6 {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.activity-content p {
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.activity-content small {
+  font-size: 0.75rem;
+}
+
+/* --- Badges --- */
+.badge {
+  font-size: 0.7rem;
+  padding: 0.35em 0.65em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+
+  .icon-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .icon-container i {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* --- Couleurs badges --- */
+.bg-primary { background-color: #0d6efd !important; }
+.bg-success { background-color: #198754 !important; }
+.bg-info { background-color: #0dcaf0 !important; }
+.bg-warning { background-color: #ffc107 !important; }
+.bg-danger { background-color: #dc3545 !important; }
+
+/* Couleurs personnalisées (optionnel : pour uniformité entre cartes) */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+.bg-gradient-success {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+.bg-gradient-info {
+  background: linear-gradient(135deg, #17a2b8, #117a8b);
+}
+
+.bg-gradient-pink {
+  background: linear-gradient(135deg, #ff5fa2, #ff7a3d);
+}
+
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #6b4cff, #7e58ff);
+}
+
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #3fc1ff, #6ad0ff);
+  color: #05314a;
+}
+
+.bg-gradient-orange {
+  background: linear-gradient(135deg, #ffa94d, #ff7b90);
+}

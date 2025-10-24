@@ -1,0 +1,74 @@
+/* Container global */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #1f2937;
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+  flex-shrink: 0; /* ← IMPORTANT */
+}
+
+/* Contenu principal */
+.main-content {
+  flex: 1;
+  background: #f9fafb;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+/* Header */
+.app-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Corps */
+/* .content-wrapper {
+  padding: 2rem;
+  flex-grow: 1;
+  overflow-y: auto;
+} */
+.content-wrapper {
+  padding-top: 0.25rem;   
+  padding-right: 2rem;  
+  padding-bottom: 1rem;   
+  padding-left: 2rem; 
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+
+/* Scrollbar moderne */
+.content-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+.content-wrapper::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* 📱 Responsive : sidebar disparaît */
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+  }
+}

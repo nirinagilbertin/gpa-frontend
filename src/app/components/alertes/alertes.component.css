@@ -1,0 +1,8 @@
+.alertes-container {
+  max-width: 500px;
+  margin: 1rem auto;
+}
+
+.list-group-item-warning {
+  background-color: #fff3cd;
+}
