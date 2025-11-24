@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import Chart from 'chart.js/auto';
 import { Conducteur, ConducteurService } from '../../services/conducteur.service';
 import { Trajet, TrajetService } from '../../services/trajet.service';
 import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
