@@ -1,0 +1,193 @@
+<div class="container py-4">
+
+  <!-- erreur -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- loader skeleton -->
+  <div *ngIf="isLoading" class="mb-4">
+    <div class="card p-4 mb-3">
+      <div class="d-flex gap-3">
+        <div class="skeleton rounded-circle" style="width:90px;height:90px;"></div>
+        <div class="flex-grow-1">
+          <div class="skeleton mb-2" style="width:40%"></div>
+          <div class="skeleton mb-2" style="width:30%"></div>
+          <div class="skeleton" style="width:20%"></div>
+        </div>
+      </div>
+    </div>
+    <!-- petites cartes skeleton -->
+    <div class="row">
+      <div class="col-md-4 mb-3" *ngFor="let i of [1,2,3]">
+        <div class="card p-3">
+          <div class="skeleton mb-2" style="height:20px;width:30%"></div>
+          <div class="skeleton" style="height:28px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- contenu -->
+  <div *ngIf="!isLoading && conducteur">
+
+    <!-- Header / Carte identité + Permissions moderne -->
+    <div class="card mb-4 p-4 shadow-sm border-0 rounded-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+    
+        <!-- Côté gauche : avatar + infos conducteur -->
+        <div class="d-flex align-items-center gap-3 flex-shrink-0">
+          <div class="avatar bi-avatar d-flex justify-content-center align-items-center">
+            <i class="bi bi-person-circle fs-3"></i>
+          </div>
+          <div>
+            <h4 class="mb-1">{{ conducteur.nom }} {{ conducteur.prenom }}</h4>
+            <p class="text-muted mb-2">Matricule : <strong>{{ conducteur.matricule }}</strong></p>
+            <div class="d-flex flex-wrap gap-2">
+              <span [ngClass]="getRoleBadgeClass(conducteur.role)" class="badge d-flex align-items-center gap-1">
+                <i class="bi bi-person-badge"></i> {{ conducteur.role | titlecase }}
+              </span>
+              <span [ngClass]="getAccessBadgeClass(conducteur.access)" class="badge d-flex align-items-center gap-1">
+                {{ conducteur.access | uppercase }}
+              </span>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Côté droit : Permissions / Niveau d'accès stylé -->
+        <div class="d-flex flex-column align-items-md-end align-items-start gap-2 flex-shrink-0">
+          <h6 class="text-muted mb-2">Permissions et Accès</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-primary">Rôle : {{ conducteur.role | titlecase }}</span>
+            <span class="badge bg-success">Accès : {{ conducteur.access | titlecase }}</span>
+            <span class="badge bg-secondary">Nom utilisateur : {{ conducteur.nomUtilisateur || '—' }}</span>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+
+    <!-- Statistiques remaniées -->
+    <div class="row g-3 mb-5">
+      <div class="col-12 col-md-4">
+        <div class="kpi-card primary">
+          <div class="kpi-icon">
+            <i class="bi bi-flag-fill"></i>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-value">{{ stats.trajets }}</div>
+            <div class="kpi-label">Trajets effectués</div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col-12 col-md-4">
+        <div class="kpi-card success">
+          <div class="kpi-icon">
+            <i class="bi bi-fuel-pump"></i>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-value">{{ stats.pleins }}</div>
+            <div class="kpi-label">Pleins réalisés</div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="col-12 col-md-4">
+        <div class="kpi-card warning">
+          <div class="kpi-icon">
+            <i class="bi bi-speedometer2"></i>
+          </div>
+          <div class="kpi-content">
+            <div class="kpi-value">{{ stats.kmTotal }} km</div>
+            <div class="kpi-label">Km total parcouru</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique (tabs) -->
+    <div class="card p-4 shadow-sm">
+      <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i> Historique</h5>
+
+      <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-trajets" data-bs-toggle="tab" data-bs-target="#trajets" type="button" role="tab">Trajets</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-pleins" data-bs-toggle="tab" data-bs-target="#pleins" type="button" role="tab">Pleins</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-entretiens" data-bs-toggle="tab" data-bs-target="#entretiens" type="button" role="tab">Entretiens</button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+
+        <!-- Trajets -->
+        <div class="tab-pane fade show active" id="trajets" role="tabpanel">
+          <div *ngIf="historique.trajets.length === 0" class="text-muted">Aucun trajet trouvé.</div>
+          <div *ngFor="let t of historique.trajets" class="mb-2">
+            <div class="list-group">
+              <div class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold">{{ t.date | date:'dd/MM/yy' }}</div>
+                  <div class="small text-muted">{{ motifToString(t.motif) }}</div>
+                </div>
+                <div class="text-end">
+                  <div>{{ (t.distanceParcourue ?? ((t.kmArriver != null && t.kmDepart != null) ? (t.kmArriver - t.kmDepart) : '—')) }} km</div>
+                  <div class="small text-muted">{{ t.status || '—' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pleins -->
+        <div class="tab-pane fade" id="pleins" role="tabpanel">
+          <div *ngIf="historique.pleins.length === 0" class="text-muted">Aucun plein enregistré.</div>
+          <div *ngFor="let p of historique.pleins" class="mb-2">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold">{{ p.date | date:'dd/MM/yy' }}</div>
+                <div class="small text-muted">{{ p.station || '—' }}</div>
+              </div>
+              <div class="text-end">
+                <div>{{ p.litre !== null && p.litre !== undefined ? p.litre : '—' }} L</div>
+                <div class="small text-muted">
+                  Coût total:
+                  {{
+                  p.coutTotal !== null && p.coutTotal !== undefined
+                  ? p.coutTotal
+                  : (p.litre != null && p.prixLitre != null ? (p.litre * p.prixLitre) : '—')
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Entretiens -->
+        <div class="tab-pane fade" id="entretiens" role="tabpanel">
+          <div *ngIf="historique.entretiens.length === 0" class="text-muted">Aucun entretien enregistré.</div>
+          <div *ngFor="let e of historique.entretiens" class="mb-2">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold">{{ e.date | date:'dd/MM/yy' }}</div>
+                <div class="small text-muted">{{ e.categorie }} — {{ e.garage || '—' }}</div>
+              </div>
+              <div class="text-end">
+                <div>Coût: {{ e.cout !== null && e.cout !== undefined ? e.cout : '—' }}</div>
+                <div class="small text-muted">
+                  KM: {{ e.kilometreCompteur !== null && e.kilometreCompteur !== undefined ? e.kilometreCompteur : '—' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

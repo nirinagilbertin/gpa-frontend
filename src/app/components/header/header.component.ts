@@ -3,15 +3,17 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../services/notification.service';
 import { interval, Subscription, switchMap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit {
+
   username = '';
   userInfo: any = {
     username: '',
@@ -19,6 +21,7 @@ export class HeaderComponent implements OnInit {
     email: '',
     phone: ''
   }
+  editMode = false;       // Edition du profil
   alertesNonLues: number = 0;
   alertes: any[] = [];
   showAlertesPanel: boolean = false;
@@ -95,6 +98,23 @@ export class HeaderComponent implements OnInit {
     });
     
     this.alertesNonLues = 0;
+  }
+
+  updateProfile() {
+    const updatedData = {
+      username: this.userInfo?.username || '',
+      email: this.userInfo?.email || '',
+      phone: this.userInfo?.phone || ''
+    };
+
+    this.auth.updateUserProfile(updatedData)?.subscribe({
+      next: (res: any) => {
+        alert(res.message); // ou utiliser NotificationService
+        this.userInfo = res.user; // mettre à jour l'affichage
+        this.editMode = false; // fermer le formulaire
+      },
+      error: (err) => console.error('Erreur mise à jour profil', err)
+    });
   }
 
   logout() {

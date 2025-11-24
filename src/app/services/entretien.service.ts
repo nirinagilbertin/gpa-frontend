@@ -13,7 +13,7 @@ export interface Entretien {
   vehicule: Vehicule;
   conducteur: Conducteur;
   cout: number;
-  kilometreCompteur: number; // ✅ ajouté ici
+  kilometreCompteur: number;
 }
 
 @Injectable({

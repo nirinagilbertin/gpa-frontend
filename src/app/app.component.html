@@ -4,7 +4,11 @@
   </div>
 
   <main class="main-content">
-    <app-header></app-header>
+    <!-- ✅ Le header est fixe et hors du contenu scrollable -->
+    <header class="app-header">
+      <app-header></app-header>
+    </header>
+    <!-- ✅ La partie qui défile -->
     <div class="content-wrapper">
       <router-outlet></router-outlet>
     </div>

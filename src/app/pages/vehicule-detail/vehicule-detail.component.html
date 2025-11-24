@@ -4,18 +4,17 @@
     <div>
       <h1 class="h2 fw-bold text-dark mb-1">{{ vehicule.marque }} {{ vehicule.modele }}</h1>
       <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-primary bg-opacity-10 text-primary fs-6">{{ vehicule.immatriculation }}</span>
+        <span class="badge bg-danger bg-opacity-10 text-white fs-6">{{ vehicule.immatriculation }}</span>
         <span class="text-muted fs-6">{{ kmTotal | number:'1.0-0' }} km total</span>
         <span class="text-muted fs-6">{{ vehicule.kilometreCompteur | number:'1.0-0' }} km actuel</span>
       </div>
     </div>
     <div class="btn-group">
-      <button class="btn btn-outline-primary btn-sm" (click)="changerFiltre('mois')" 
-              [class.active]="filtre === 'mois'">
+      <button class="btn btn-outline-danger btn-sm" (click)="changerFiltre('mois')" [class.active]="filtre === 'mois'">
         Ce mois
       </button>
-      <button class="btn btn-outline-primary btn-sm" (click)="changerFiltre('annee')" 
-              [class.active]="filtre === 'annee'">
+      <button class="btn btn-outline-danger btn-sm" (click)="changerFiltre('annee')"
+        [class.active]="filtre === 'annee'">
         Cette année
       </button>
     </div>
@@ -31,15 +30,15 @@
         <div class="kpi-content">
           <div class="kpi-value">{{ kmAujourdhui | number:'1.0-0' }} km</div>
           <div class="kpi-label">Aujourd'hui</div>
-          <div class="kpi-trend" [class.positive]="evolutionKm.aujourdhui > 5" 
-                               [class.negative]="evolutionKm.aujourdhui < -5">
+          <div class="kpi-trend" [class.positive]="evolutionKm.aujourdhui > 5"
+            [class.negative]="evolutionKm.aujourdhui < -5">
             <i class="bi {{ getEvolutionIcon(evolutionKm.aujourdhui) }}"></i>
             {{ evolutionKm.aujourdhui > 0 ? '+' : '' }}{{ evolutionKm.aujourdhui | number:'1.1-1' }}%
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="col-12 col-md-6 col-lg-3">
       <div class="kpi-card success">
         <div class="kpi-icon">
@@ -48,15 +47,15 @@
         <div class="kpi-content">
           <div class="kpi-value">{{ kmCeMois | number:'1.0-0' }} km</div>
           <div class="kpi-label">Ce mois</div>
-          <div class="kpi-trend" [class.positive]="evolutionKm.moisPrecedent > 5" 
-                               [class.negative]="evolutionKm.moisPrecedent < -5">
+          <div class="kpi-trend" [class.positive]="evolutionKm.moisPrecedent > 5"
+            [class.negative]="evolutionKm.moisPrecedent < -5">
             <i class="bi {{ getEvolutionIcon(evolutionKm.moisPrecedent) }}"></i>
             {{ evolutionKm.moisPrecedent > 0 ? '+' : '' }}{{ evolutionKm.moisPrecedent | number:'1.1-1' }}%
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="col-12 col-md-6 col-lg-3">
       <div class="kpi-card warning">
         <div class="kpi-icon">
@@ -69,7 +68,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="col-12 col-md-6 col-lg-3">
       <div class="kpi-card danger">
         <div class="kpi-icon">
@@ -103,7 +102,8 @@
                 <div class="comparison-grid">
                   <div class="comparison-item">
                     <span class="comparison-label">Période actuelle</span>
-                    <span class="comparison-value">{{ (filtre === 'mois' ? kmCeMois : kmCetteAnnee) | number:'1.0-0' }} km</span>
+                    <span class="comparison-value">{{ (filtre === 'mois' ? kmCeMois : kmCetteAnnee) | number:'1.0-0' }}
+                      km</span>
                   </div>
                   <div class="comparison-item">
                     <span class="comparison-label">Moyenne</span>
@@ -111,15 +111,16 @@
                   </div>
                   <div class="comparison-item">
                     <span class="comparison-label">Écart</span>
-                    <span class="comparison-value" [class.text-success]="getPerformanceMensuelle().ecart > 0" 
-                          [class.text-danger]="getPerformanceMensuelle().ecart < 0">
-                      {{ getPerformanceMensuelle().ecart > 0 ? '+' : '' }}{{ getPerformanceMensuelle().ecart | number:'1.0-0' }} km
+                    <span class="comparison-value" [class.text-success]="getPerformanceMensuelle().ecart > 0"
+                      [class.text-danger]="getPerformanceMensuelle().ecart < 0">
+                      {{ getPerformanceMensuelle().ecart > 0 ? '+' : '' }}{{ getPerformanceMensuelle().ecart |
+                      number:'1.0-0' }} km
                     </span>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div class="col-12 col-md-6">
               <div class="efficiency-stats">
                 <h6 class="metric-title">Efficacité</h6>
@@ -170,9 +171,9 @@
                   <td>
                     <div class="distance-cell">
                       <div class="distance-value">{{ (trajet.distanceParcourue || 0) | number:'1.0-0' }} km</div>
-                      <div class="distance-comparison" 
-                           [class.above-average]="(trajet.distanceParcourue || 0) > getMoyenneDistance()"
-                           [class.below-average]="(trajet.distanceParcourue || 0) < getMoyenneDistance()">
+                      <div class="distance-comparison"
+                        [class.above-average]="(trajet.distanceParcourue || 0) > getMoyenneDistance()"
+                        [class.below-average]="(trajet.distanceParcourue || 0) < getMoyenneDistance()">
                         {{ abs((trajet.distanceParcourue || 0) - getMoyenneDistance()) | number:'1.0-0' }} km
                         {{ (trajet.distanceParcourue || 0) > getMoyenneDistance() ? 'au-dessus' : 'en-dessous' }}
                       </div>
@@ -182,16 +183,15 @@
                     <span class="driver-tag">{{ getConducteurLabel(trajet.conducteur) }}</span>
                   </td>
                   <td>
-                    <span class="efficiency-rating" 
-                         [class.high]="getEfficiencyRating(trajet) === 'high'"
-                         [class.medium]="getEfficiencyRating(trajet) === 'medium'"
-                         [class.low]="getEfficiencyRating(trajet) === 'low'">
+                    <span class="efficiency-rating" [class.high]="getEfficiencyRating(trajet) === 'high'"
+                      [class.medium]="getEfficiencyRating(trajet) === 'medium'"
+                      [class.low]="getEfficiencyRating(trajet) === 'low'">
                       {{ getEfficiencyRating(trajet) | titlecase }}
                     </span>
                   </td>
                   <td>
                     <span class="status-badge" [class.completed]="trajet.status === 'terminé'"
-                          [class.in-progress]="trajet.status === 'en cours'">
+                      [class.in-progress]="trajet.status === 'en cours'">
                       {{ trajet.status }}
                     </span>
                   </td>
@@ -218,21 +218,21 @@
           <div class="chart-container" style="height: 200px;">
             <canvas id="repartitionChart"></canvas>
           </div>
-          
+
           <div class="cost-analysis mt-3">
             <div class="cost-item">
               <div class="cost-label">Carburant</div>
               <div class="cost-bar">
-                <div class="cost-progress carburant" 
-                     [style.width.%]="coutsTotal > 0 ? (repartition.carburant / coutsTotal) * 100 : 0"></div>
+                <div class="cost-progress carburant"
+                  [style.width.%]="coutsTotal > 0 ? (repartition.carburant / coutsTotal) * 100 : 0"></div>
               </div>
               <div class="cost-value">{{ repartition.carburant | number:'1.0-0' }} Ar</div>
             </div>
             <div class="cost-item">
               <div class="cost-label">Entretien</div>
               <div class="cost-bar">
-                <div class="cost-progress entretien" 
-                     [style.width.%]="coutsTotal > 0 ? (repartition.entretien / coutsTotal) * 100 : 0"></div>
+                <div class="cost-progress entretien"
+                  [style.width.%]="coutsTotal > 0 ? (repartition.entretien / coutsTotal) * 100 : 0"></div>
               </div>
               <div class="cost-value">{{ repartition.entretien | number:'1.0-0' }} Ar</div>
             </div>

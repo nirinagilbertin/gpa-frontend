@@ -11,6 +11,8 @@ import { LoginComponent } from './pages/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AlerterComponent } from './pages/alerter/alerter.component';
 import { StatistiqueComponent } from './pages/statistique/statistique.component';
+import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { ConducteurDetailComponent } from './pages/conducteur-detail/conducteur-detail.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,11 +24,13 @@ export const routes: Routes = [
       { path: 'vehicules', component: VehiculesComponent },
       { path: 'vehicules/:id', component: VehiculeDetailComponent },
       { path: 'conducteurs', component: ConducteursComponent },
+      { path: 'conducteurs/:id', component: ConducteurDetailComponent },
       { path: 'trajets', component: TrajetsComponent },
       { path: 'carburants', component: CarburantsComponent },
       { path: 'entretiens', component: EntretiensComponent },
       { path: 'alerter', component: AlerterComponent},
       { path: 'statistique', component: StatistiqueComponent},
+      { path: 'utilisateur', component: UserManagementComponent},
       { path: '', redirectTo: '/accueil', pathMatch: 'full' },
     ],
   },

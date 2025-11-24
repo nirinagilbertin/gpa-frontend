@@ -11,7 +11,7 @@
       </select>
       <input type="text" class="search-input" placeholder="Recherche par motif..." (input)="onSearchChange()"
         [(ngModel)]="searchTerm">
-      <button class="btn btn-success">
+      <button class="btn btn-success" (click)="genererRapport()">
         <i class="bi bi-printer fs-6"></i>
       </button>
       <button class="btn btn-primary" (click)="openModal()">+ Ajouter</button>
@@ -22,12 +22,11 @@
   <div class="card shadow-sm mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        
+
         <!-- Filtre par date spécifique -->
         <div class="col-md-3">
           <label class="form-label small fw-bold">Date spécifique</label>
-          <input type="date" class="form-control" [(ngModel)]="dateFilter" 
-                 (change)="onDateFilterChange()">
+          <input type="date" class="form-control" [(ngModel)]="dateFilter" (change)="onDateFilterChange()">
         </div>
 
         <!-- Filtre par période -->
@@ -35,12 +34,12 @@
           <label class="form-label small fw-bold">Période</label>
           <div class="row g-2">
             <div class="col-6">
-              <input type="date" class="form-control" [(ngModel)]="dateDebut" 
-                     (change)="onPeriodeFilterChange()" placeholder="Début">
+              <input type="date" class="form-control" [(ngModel)]="dateDebut" (change)="onPeriodeFilterChange()"
+                placeholder="Début">
             </div>
             <div class="col-6">
-              <input type="date" class="form-control" [(ngModel)]="dateFin" 
-                     (change)="onPeriodeFilterChange()" placeholder="Fin">
+              <input type="date" class="form-control" [(ngModel)]="dateFin" (change)="onPeriodeFilterChange()"
+                placeholder="Fin">
             </div>
           </div>
         </div>
@@ -73,7 +72,7 @@
       Affichage de <strong>{{ filteredTrajets.length }}</strong>
       trajet(s) sur <strong>{{ trajets.length }}</strong> au total
     </small>
-  
+
     <!-- Indicateurs de filtres actifs AMÉLIORÉS -->
     <div *ngIf="dateFilter || (dateDebut && dateFin) || searchTerm" class="d-flex gap-2 flex-wrap">
       <span *ngIf="dateFilter" class="badge bg-primary d-flex align-items-center">
@@ -181,7 +180,8 @@
           </thead>
           <tbody>
             <tr *ngFor="let t of filteredTrajets">
-              <td>{{ t.date | date:'shortDate' }}</td>
+              <!-- <td>{{ t.date | date:'shortDate' }}</td> -->
+              <td>{{ t.date | date:'dd/MM/yy' }}</td>
               <td>{{ t.heure }}</td>
               <td>{{ t.motif.join(', ') }}</td>
               <td>{{ t.kmDepart }}</td>
@@ -204,8 +204,8 @@
                 </button>
               </td>
               } @else {
-                <td class="d-flex justify-content-center gap-1">
-                <button class="btn btn-outline-primary btn-sm" (click)="openModal(t)">
+              <td class="d-flex justify-content-center gap-1">
+                <button class="btn btn-outline-primary btn-sm" (click)="openTrajetDetails(t)">
                   <i class="bi bi-eye-fill"></i>
                 </button>
               </td>
@@ -224,7 +224,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content shadow-lg">
       <form [formGroup]="trajetForm" (ngSubmit)="saveTrajet()">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">{{ isEditMode ? 'Modifier' : 'Nouveau' }} Trajet</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
@@ -310,6 +310,71 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Détails Trajet (style identique au modal d'ajout) -->
+<div class="modal fade" id="trajetDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-sm">
+      <!-- Header -->
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Détails du trajet</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" *ngIf="selectedTrajet">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Date :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.date | date:'dd/MM/yy' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Heure :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.heure }}</p>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Motif :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.motif }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Véhicule :</label>
+            <p class="form-control-plaintext">{{ getVehiculeLabel(selectedTrajet.vehicule) }}</p>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Km départ :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.kmDepart }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Km arrivée :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.kmArriver }}</p>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Kilomètres parcourus :</label>
+            <p class="form-control-plaintext">{{ selectedTrajet.distanceParcourue }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Conducteur :</label>
+            <p class="form-control-plaintext">{{ getConducteurLabel(selectedTrajet.conducteur) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
     </div>
   </div>
 </div>

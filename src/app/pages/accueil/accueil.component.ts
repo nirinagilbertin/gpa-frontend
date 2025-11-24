@@ -19,13 +19,6 @@ export class AccueilComponent implements OnInit {
   @ViewChild('trajetChart') chartRef!: ElementRef;
   private chart: any;
 
-  stats = {
-    totalVehicules: 15,
-    totalDepenses: 12450,
-    vehiculeActif: 'Renault Kangoo',
-    prochainEntretien: 'Renault Kangoo'
-  };
-
   // total
   totalVehicules: number = 0;
   totalConducteur: number = 0;
@@ -85,6 +78,8 @@ export class AccueilComponent implements OnInit {
         this.trajets = data;
         this.totalTrajet = data.length;
         this.dernierTrajet = data[0];
+        // Mettre à jour le graphique après chargement des trajets
+        setTimeout(() => this.createChart(), 200);
       }
     })
     // Carburant
@@ -151,20 +146,55 @@ export class AccueilComponent implements OnInit {
 
   createChart() {
     const ctx = this.chartRef.nativeElement.getContext('2d');
-    
+
+    // --- Préparer les 7 derniers jours ---
+    const daysLabels: string[] = [];
+    const daysData: number[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const label = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+      daysLabels.push(label);
+      daysData.push(0);
+    }
+
+    // --- Agréger les distances depuis tes trajets ---
+    this.trajets.forEach((t) => {
+      if (!t.date || !t.distanceParcourue) return;
+      const trajetDate = new Date(t.date);
+      const diffDays = Math.floor((new Date().getTime() - trajetDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays < 7) {
+        const dayIndex = 6 - diffDays;
+        daysData[dayIndex] += t.distanceParcourue;
+      }
+    });
+
+    // Détruire l'ancien graphique s'il existe
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    // --- Créer le graphique ---
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-        datasets: [{
-          label: 'Trajets (km)',
-          data: [320, 450, 280, 510, 390, 620, 480],
-          backgroundColor: 'rgba(13, 110, 253, 0.1)',
-          borderColor: '#0d6efd',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
+        labels: daysLabels,
+        datasets: [
+          {
+            label: 'Distance parcourue (km)',
+            data: daysData,
+            backgroundColor: 'rgba(220, 53, 69, 0.1)', // Rouge doux semi-transparent
+            borderColor: '#dc3545',                     // Rouge Bootstrap
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#dc3545',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#dc3545',
+            fill: true,
+            tension: 0.4,
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -172,20 +202,55 @@ export class AccueilComponent implements OnInit {
         plugins: {
           legend: {
             position: 'top',
-          }
+            labels: {
+              color: '#444', // Texte gris foncé pour lisibilité
+              font: {
+                size: 13,
+                family: 'Poppins, sans-serif',
+              },
+            },
+          },
+          title: {
+            display: true,
+            text: 'Évolution du kilométrage total (7 derniers jours)',
+            color: '#222',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Poppins, sans-serif',
+            },
+          },
+          tooltip: {
+            backgroundColor: '#fff',
+            titleColor: '#dc3545',
+            bodyColor: '#333',
+            borderColor: '#dc3545',
+            borderWidth: 1,
+          },
         },
         scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              color: '#555',
+            },
+          },
           y: {
             beginAtZero: true,
+            grid: {
+              color: 'rgba(220, 53, 69, 0.1)', // Lignes rouges très claires
+            },
             ticks: {
-              callback: function(value) {
-                return value + ' km';
-              }
-            }
-          }
-        }
-      }
+              color: '#555',
+              callback: (value) => value + ' km',
+            },
+          },
+        },
+      },
     });
+
   }
 
   // Mettre à jour les données

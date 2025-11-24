@@ -1,36 +1,53 @@
-/* Header global */
+/* --- HEADER CLAIR AVEC ACCENTS ROUGES --- */
 .app-header {
-  background: linear-gradient(90deg, #1f2937, #2563eb);
-  color: #fff;
-  border-bottom: none;
+  background: #ffffff;
+  color: #212529;
+  border-bottom: 3px solid #e63946;
   padding: 0.75rem 1.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
-/* Logo animation */
+/* Logo */
 .logo-icon {
-  transition: transform 0.3s ease;
+  color: #e63946 !important;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 .logo-icon:hover {
   transform: rotate(15deg) scale(1.1);
+  color: #c1121f !important;
 }
 
-/* Boutons icônes */
+/* Titre */
+.app-header span.h5 {
+  color: #333 !important;
+}
+
+/* Boutons icônes (notifications, profil, etc.) */
 .app-header .btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem;
-  transition: background 0.2s, transform 0.2s;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  background: #ffffff;
+  color: #444;
+  transition: all 0.2s ease;
 }
 
 .app-header .btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
+  background: #e63946;
   color: #fff;
+  transform: scale(1.05);
+  border-color: #e63946;
+}
+
+/* Badge notification */
+.bg-danger {
+  background-color: #e63946 !important;
 }
 
 /* Notifications badge animation */
@@ -45,22 +62,22 @@
 
 /* Profil utilisateur */
 .profile-btn {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  transition: background 0.2s, transform 0.2s;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  color: #333;
 }
 .profile-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
+  background: #e63946;
+  color: #fff;
 }
 
-/* Icon profile animation */
 .profile-icon {
-  font-size: 1.5rem;
-  transition: transform 0.3s;
+  color: #e63946;
+  transition: transform 0.3s, color 0.3s;
 }
 .profile-btn:hover .profile-icon {
   transform: rotate(-15deg) scale(1.1);
+  color: #fff;
 }
 
 /* Dropdown menu */
@@ -74,76 +91,164 @@
   color: #fff;
 }
 
-/* Nom utilisateur */
-.username-text {
-  font-weight: 600;
-}
+/* =========================================
+   OFFCANVAS PROFIL & PANEL ALERTES
+   Thème Blanc/Rouge – Style Premium
+========================================= */
 
-/* ----- OFFCANVAS STYLE ----- */
+/* --- USER PANEL --- */
 .user-panel {
   width: 320px;
   border-left: 1px solid #e6e6e6;
   background: #ffffff;
+  font-family: 'Inter', sans-serif;
+  border-radius: 0 16px 16px 0;
   animation: slideIn 0.3s ease;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
+/* Animation slide in */
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* Avatar stylé */
+/* Offcanvas header */
+.offcanvas-header {
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.offcanvas-title {
+  color: #e63946; /* rouge vif */
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Avatar stylé et animé */
 .avatar-wrapper {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #0d6efd, #004aad);
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, #f94144, #f3722c);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.4);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Titres sections */
-.info-section h6, .action-section h6 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.avatar-wrapper i {
+  font-size: 2.5rem;
+  color: #fff;
+  transition: transform 0.3s ease;
 }
 
-/* Liste d'infos */
-.info-section ul {
-  font-size: 0.95rem;
+.avatar-wrapper:hover {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Nom & rôle utilisateur */
+.user-panel h5 {
+  font-weight: 700;
   color: #333;
+  text-align: center;
+}
+.user-panel .text-muted {
+  color: #6c757d;
+  display: block;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+/* Sections titres */
+.info-section h6,
+.action-section h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e63946;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+/* Liste infos utilisateur */
+.info-section ul {
+  padding-left: 0.5rem;
+}
+.info-section ul li {
+  margin-bottom: 0.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+.info-section ul li i {
+  margin-right: 0.5rem;
+  color: #f94144;
+  transition: transform 0.3s ease;
+}
+.info-section ul li:hover i {
+  transform: scale(1.2);
+}
+
+/* Inputs édition */
+.user-panel input.form-control {
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+.user-panel input.form-control:focus {
+  border-color: #e63946;
+  box-shadow: 0 0 0 0.2rem rgba(230,57,70,0.2);
 }
 
 /* Boutons */
 .action-section .btn {
-  border-radius: 10px;
-  font-weight: 500;
+  border-radius: 12px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.action-section .btn:hover {
-  transform: translateY(-2px);
+/* Bouton gradient rouge vif */
+.action-section .btn-primary {
+  background: linear-gradient(135deg, #f94144, #f3722c);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(249,65,68,0.3);
+}
+.action-section .btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(249,65,68,0.4);
 }
 
-.btn-outline-primary:hover {
-  background-color: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
+/* Bouton outline rouge */
+.action-section .btn-outline-primary {
+  border-color: #e63946;
+  color: #e63946;
+}
+.action-section .btn-outline-primary:hover {
+  background: #f94144;
+  color: #fff;
+  border-color: #f94144;
 }
 
+/* Btn secondary hover */
 .btn-outline-secondary:hover {
   background-color: #6c757d;
-  color: white;
+  color: #fff;
 }
 
+/* Btn danger */
 .btn-danger {
   background-color: #dc3545;
   border: none;
 }
-
 .btn-danger:hover {
   background-color: #bb2d3b;
 }
@@ -154,99 +259,156 @@ hr {
   margin: 1.5rem 0;
 }
 
-/* Panel des alertes */
+/* --- ALERTES PANEL --- */
 .alertes-panel {
   position: fixed;
   top: 0;
-  right: -400px;
-  width: 400px;
+  right: -420px;
+  width: 420px;
   height: 100vh;
-  background: white;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  box-shadow: -8px 0 20px rgba(0,0,0,0.15);
   z-index: 1060;
-  transition: right 0.3s ease;
   display: flex;
   flex-direction: column;
+  border-radius: 0 16px 16px 0;
+  transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
 }
 
-.alertes-panel.show {
-  right: 0;
-}
+.alertes-panel.show { right: 0; }
 
+/* Header rouge gradient alertes */
 .alertes-panel-header {
-  background: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background: linear-gradient(135deg, #f94144, #f3722c);
+  color: #fff;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(249,65,68,0.15);
+  border-radius: 0 16px 0 0;
+}
+.alertes-panel-header i {
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+}
+.alertes-panel-header i:hover {
+  transform: rotate(15deg) scale(1.1);
 }
 
+/* Body alertes */
 .alertes-panel-body {
   flex: 1;
   overflow-y: auto;
   max-height: calc(100vh - 140px);
-}
-
-.alertes-panel-footer {
+  padding: 0.75rem 1rem;
   background: #f8f9fa;
 }
 
-/* Liste des alertes */
-.alertes-list {
-  padding: 0;
-}
+/* Liste alertes */
+.alertes-list { list-style: none; margin:0; padding:0; }
 
+/* Item alerte */
 .alerte-item {
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin: 0.25rem 0;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
 }
-
 .alerte-item:hover {
-  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* Non lue */
 .alerte-non-lue {
-  background-color: #fffbf0;
-  border-left: 4px solid #ffc107;
+  border-left: 4px solid #f94144;
+  background: #fff0f0;
 }
 
-.alerte-lue {
-  background-color: #f8f9fa;
-  opacity: 0.8;
-}
-
+/* Icône alerte */
 .alerte-icon {
   flex-shrink: 0;
+  font-size: 1.5rem;
+  color: #e63946;
+  margin-right: 0.5rem;
+  transition: transform 0.3s ease;
+}
+.alerte-icon:hover { transform: scale(1.2); }
+
+/* Message */
+.alerte-item h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.alerte-item small {
+  font-size: 0.8rem;
+  color: #6c757d;
 }
 
+/* Actions alertes */
 .alerte-actions {
-  flex-shrink: 0;
+  margin-left: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+.alerte-actions .btn-success {
+  background: linear-gradient(135deg, #198754, #0f5132);
+  border: none;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.alerte-actions .btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25,135,84,0.3);
+}
+
+/* Footer alertes */
+.alertes-panel-footer {
+  background: #f1f3f5;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #dee2e6;
+}
+.alertes-panel-footer .btn-outline-primary {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.alertes-panel-footer .btn-outline-primary:hover {
+  background-color: #f94144;
+  color: #fff;
+  border-color: #f94144;
 }
 
 /* Overlay */
 .alertes-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  top:0; left:0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.35);
   z-index: 1055;
-  opacity: 0;
-  visibility: hidden;
+  opacity:0;
+  visibility:hidden;
   transition: all 0.3s ease;
 }
-
 .alertes-overlay.show {
-  opacity: 1;
+  opacity:1;
   visibility: visible;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .alertes-panel {
-    width: 100vw;
-    right: -100vw;
-  }
-  
-  .alertes-panel.show {
-    right: 0;
-  }
+  .alertes-panel { width: 100vw; right: -100vw; }
+  .alertes-panel.show { right: 0; }
 }
+
+

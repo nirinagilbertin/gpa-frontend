@@ -1,10 +1,3 @@
-/* Container général */
-/* .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-} */
-
 /* Header moderne */
 .header-container {
   display: flex;
@@ -94,7 +87,7 @@
   cursor: pointer;
 }
 
-.vehicule-card .avatar {
+ .vehicule-card .avatar {
   width: 55px;
   height: 55px;
   border-radius: 50%;
@@ -103,8 +96,15 @@
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  color: #2575fc;
+  /* Retire la couleur ici */
+  color: inherit;
 }
+
+/* L'icône seule devient rouge */
+.vehicule-card .avatar i {
+  color: #dc3545; /* rouge élégant Bootstrap */
+}
+
 
 /* Section actions */
 .card-actions {
@@ -140,14 +140,13 @@
 /* modal */
 /* --- Header --- */
 .modal-header {
-  background: #2563eb; /* Bleu sidebar/header */
   color: #fff;
   border-bottom: none;
   padding: 1rem 1.5rem;
 }
 
 .modal-title {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.3rem;
 }
 
@@ -228,56 +227,3 @@
     gap: 0.5rem;
   }
 }
-
-
-/* Modal styling */
-/* .modal-content {
-  border-radius: 15px;
-  padding: 1rem;
-  overflow: hidden;
-}
-
-.modal-header {
-  border-bottom: none;
-}
-
-.modal-title {
-  font-weight: 600;
-  font-size: 1.3rem;
-}
-
-.modal-body input,
-.modal-body select {
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  transition: border-color 0.2s;
-}
-
-.modal-body input:focus,
-.modal-body select:focus {
-  border-color: #2575fc;
-  outline: none;
-  box-shadow: 0 0 5px rgba(37, 117, 252, 0.3);
-}
-
-.modal-footer .btn-primary {
-  background: linear-gradient(90deg, #6a11cb, #2575fc);
-}
-
-.modal-footer .btn-secondary {
-  background: #eee;
-  color: #333;
-  border: none;
-}
-
-.modal-footer .btn-secondary:hover {
-  background: #ddd;
-} */
-
-/* Responsive */
-/* @media (max-width: 768px) {
-  .row {
-    flex-direction: column;
-  }
-} */

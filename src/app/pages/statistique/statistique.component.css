@@ -1,62 +1,121 @@
-:root {
-  --primary-color: #3498db;
-  --secondary-color: #2ecc71;
-  --accent-color: #e74c3c;
-  --light-bg: #f8f9fa;
-  --dark-text: #2c3e50;
-}
-
-.dashboard-container {
-  padding: 20px;
-  background-color: var(--light-bg);
-  min-height: 100vh;
-}
-
+/* === HEADER === */
 .dashboard-header {
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.card {
+.dashboard-title {
+  font-weight: 700;
+  color: #2b2b2b;
+  font-size: 1.8rem;
+}
+
+.btn-refresh {
+  background: linear-gradient(90deg, #f8d7da, #f5c6cb); /* rouge pastel doux */
+  color: #842029; /* texte rouge foncé */
   border: none;
+  padding: 0.6rem 1.2rem;
   border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: 0.3s ease;
+}
+.btn-refresh:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* === INDICATEURS === */
+.dashboard-card {
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #ffffff;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
 }
 
+/* Titres et badges */
 .card-title {
-  color: var(--dark-text);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+}
+
+/* Icones dans un cercle */
+.icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+/* Rouge atténué pour badges et icônes */
+.bg-light-danger {
+  background-color: #f5c6cb; /* rouge pastel doux */
+  color: #842029; /* texte rouge foncé */
+}
+
+/* === ETATS === */
+.state {
+  text-align: center;
+  color: #777;
+  margin-top: 2rem;
+}
+.state.empty i {
+  font-size: 4rem;
+  opacity: 0.3;
+}
+
+/* === GRAPHIQUES === */
+.chart-card {
+  border-radius: 12px;
+  background-color: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-header h5 {
   font-weight: 600;
-  margin-bottom: 15px;
 }
 
-.chart-container {
-  position: relative;
-  height: 300px;
-  width: 100%;
+canvas {
+  width: 100% !important;
+  max-height: 400px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 10px;
-  }
-  
-  .chart-container {
-    height: 250px;
-  }
+/* --- Etats vides / Loading --- */
+.state-loading, .empty-state {
+  text-align: center;
+  color: #6c757d;
 }
 
-/* Animation pour le chargement des graphiques */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* === ANIMATION === */
+.spin {
+  animation: spin 1s linear infinite;
 }
-
-.card-body {
-  animation: fadeIn 0.5s ease-in;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

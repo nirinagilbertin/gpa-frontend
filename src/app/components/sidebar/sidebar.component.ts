@@ -30,13 +30,14 @@ export class SidebarComponent {
 
   menuItems = [
     { path: '/accueil', icon: 'house-fill', label: 'Accueil' },
+    { path: '/utilisateur', icon: 'person', label: 'Utilisateur'},
     { path: '/vehicules', icon: 'truck', label: 'Véhicules' },
     { path: '/conducteurs', icon: 'person-badge', label: 'Conducteurs' },
     { path: '/trajets', icon: 'geo-alt', label: 'Trajets' },
     { path: '/carburants', icon: 'fuel-pump', label: 'Carburant' },
     { path: '/entretiens', icon: 'tools', label: 'Entretien'},
     { path: '/alerter', icon: 'bell', label: 'Alerte'},
-    { path: '/statistique', icon: 'graph-down', label: 'Statistique'}
+    { path: '/statistique', icon: 'graph-down', label: 'Statistique'},
   ];
 
 }

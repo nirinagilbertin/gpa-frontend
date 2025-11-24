@@ -5,7 +5,7 @@
     <div class="header-actions">
       <input type="text" class="search-input" placeholder="Recherche par catégorie..." [(ngModel)]="searchTerm"
         (input)="onSearchChange()">
-      <button class="btn btn-success">
+      <button class="btn btn-success" (click)="genererRapportEntretien()">
         <i class="bi bi-printer fs-6"></i>
       </button>
       <button class="btn btn-primary" (click)="openModal()">+ Ajouter</button>
@@ -49,8 +49,8 @@
       <div class="card shadow-sm border-0 card-stat">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
-            <small class="text-muted">Entretiens en retard</small>
-            <h5 class="mt-1">{{ entretiensOverdue.length }}</h5>
+            <small class="text-muted">Véhicule le plus entretenu</small>
+            <h5 class="mt-1">{{ getVehiculeLabel(vehiculePlusEntretenu?.vehicule) }}</h5>
           </div>
           <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
             style="width:50px; height:50px;">
@@ -64,8 +64,8 @@
       <div class="card shadow-sm border-0 card-stat">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
-            <small class="text-muted">Prochain entretien</small>
-            <p class="categorie-stat">Vidange - Renault clio</p>
+            <small class="text-muted">Véhicule le plus dépensier</small>
+            <h5 class="mt-1">{{ getVehiculeLabel(vehiculePlusDepensier?.vehicule) }}</h5>
           </div>
           <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
             style="width:50px; height:50px;">
@@ -124,7 +124,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content shadow-lg">
       <form [formGroup]="entretienForm" (ngSubmit)="saveEntretien()">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">{{ isEditMode ? 'Modifier' : 'Nouvel' }} Entretien</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>

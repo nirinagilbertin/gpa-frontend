@@ -8,7 +8,7 @@
         <option value="trimestre">Ce trimestre</option>
         <option value="annee">Cette année</option>
       </select>
-      <button class="btn btn-success">
+      <button class="btn btn-success" (click)="genererRapportCarburant()">
         <i class="bi bi-printer fs-6"></i>
       </button>
       <button class="btn btn-primary" (click)="openModal()">+ Ajouter</button>
@@ -94,7 +94,8 @@
           </thead>
           <tbody>
             <tr *ngFor="let c of carburants">
-              <td>{{ c.date | date:'shortDate' }}</td>
+              <!-- <td>{{ c.date | date:'shortDate' }}</td> -->
+               <td>{{ c.date | date:'dd/MM/yy' }}</td>
               <td>{{ getVehiculeLabel(c.vehicule) }}</td>
               <td>{{ getConducteurLabel(c.conducteur) }}</td>
               <td>{{ c.station }}</td>
@@ -123,7 +124,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content shadow-lg">
       <form [formGroup]="carburantForm" (ngSubmit)="saveCarburant()">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">{{ isEditMode ? 'Modifier' : 'Nouveau' }} Carburant</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>

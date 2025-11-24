@@ -1,7 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, AfterViewInit, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Chart, CategoryScale, LinearScale, BarElement, ArcElement, BarController, Title, Tooltip, Legend } from 'chart.js';
+import { forkJoin } from 'rxjs';
+import { Trajet, TrajetService } from '../../services/trajet.service';
+import { Carburant, CarburantService } from '../../services/carburant.service';
+import { Entretien, EntretienService } from '../../services/entretien.service';
+import { Vehicule, VehiculeService } from '../../services/vehicule.service';
+
+// Enregistrer les composants Chart.js une seule fois
+Chart.register(CategoryScale, LinearScale, BarElement, ArcElement, BarController, Title, Tooltip, Legend);
+
+interface MonthlyData {
+  labels: string[];
+  distances: number[];
+  coutCarburant: number[];
+  coutEntretien: number[];
+}
 
 @Component({
   selector: 'app-statistique',
@@ -10,127 +24,508 @@ Chart.register(...registerables);
   templateUrl: './statistique.component.html',
   styleUrl: './statistique.component.css'
 })
-export class StatistiqueComponent implements OnInit {
+export class StatistiqueComponent implements OnInit, OnDestroy {
+  @ViewChild('chartKm') chartKmRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartCarburant') chartCarburantRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartCouts') chartCoutsRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTopVehicules') chartTopVehiculesRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('chartTrajets') chartTrajetsRef!: ElementRef<HTMLCanvasElement>;
 
-  // Données fictives
-  vehicleTypes = ['Voiture', 'Moto', 'Camion', 'Utilitaire'];
-  vehicleDistributionData = [65, 20, 10, 5];
-  vehicleDistributionColors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12'];
+  trajets: Trajet[] = [];
+  carburants: Carburant[] = [];
+  entretiens: Entretien[] = [];
+  vehicules: Vehicule[] = [];
 
-  months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-  fuelConsumptionData = {
-    voiture: [45, 52, 48, 55, 60, 65, 70, 68, 62, 58, 50, 47],
-    moto: [15, 18, 16, 20, 22, 25, 28, 26, 23, 20, 17, 15],
-    camion: [120, 125, 118, 130, 135, 140, 145, 142, 138, 132, 125, 120],
-    utilitaire: [80, 85, 82, 88, 92, 95, 98, 96, 93, 90, 85, 82]
-  };
+  charts: Chart[] = [];
 
-  maintenanceCosts = [
-    { vehicle: 'Toyota Corolla', cost: 1200 },
-    { vehicle: 'Honda Civic', cost: 950 },
-    { vehicle: 'Ford F-150', cost: 1800 },
-    { vehicle: 'BMW Série 3', cost: 2200 },
-    { vehicle: 'Harley Davidson', cost: 800 },
-    { vehicle: 'Yamaha MT-07', cost: 650 }
-  ];
+  // Indicateurs
+  averageDailyKm: number = 0;
+  vehiculePlusUtilise: string = 'Aucun';
+  totalKilometres: number = 0;
+  totalDepenses: number = 0;
 
-  activityRates = [
-    { vehicle: 'Toyota Corolla', trips: 45 },
-    { vehicle: 'Honda Civic', trips: 38 },
-    { vehicle: 'Ford F-150', trips: 28 },
-    { vehicle: 'BMW Série 3', trips: 32 },
-    { vehicle: 'Harley Davidson', trips: 22 },
-    { vehicle: 'Yamaha MT-07', trips: 18 }
-  ];
+  isLoading: boolean = true;
+  hasData: boolean = false;
 
-  totalCostData = {
-    labels: ['Toyota Corolla', 'Honda Civic', 'Ford F-150', 'BMW Série 3', 'Harley Davidson', 'Yamaha MT-07'],
-    fuel: [3200, 2800, 4500, 3800, 1200, 1000],
-    maintenance: [1200, 950, 1800, 2200, 800, 650],
-    other: [600, 500, 800, 1000, 300, 250]
-  };
+  // Nouvelle propriété pour les dépenses globales
+  repartitionDepenses: { label: string; montant: number; couleur: string }[] = [];
 
-  ngOnInit(): void {
-    this.createVehicleDistributionChart();
-    this.createFuelConsumptionChart();
-    this.createMaintenanceCostChart();
-    this.createActivityRateChart();
-    this.createTotalCostChart();
+  constructor(
+    private trajetService: TrajetService,
+    private carburantService: CarburantService,
+    private entretienService: EntretienService,
+    private vehiculeService: VehiculeService
+  ) {}
+
+  ngOnInit() {
+    this.loadData();
   }
 
-  // --- KPI Calculations ---
-  get totalVehicles(): number {
-    return this.vehicleDistributionData.reduce((a,b)=>a+b,0);
+  ngOnDestroy() {
+    this.destroyCharts();
   }
 
-  get mostUsedVehicle(): string {
-    return this.activityRates.sort((a,b)=>b.trips - a.trips)[0].vehicle;
-  }
-
-  get highestMaintenance(): string {
-    return this.maintenanceCosts.sort((a,b)=>b.cost - a.cost)[0].vehicle;
-  }
-
-  get totalAnnualCost(): number {
-    const fuel = this.totalCostData.fuel.reduce((a,b)=>a+b,0);
-    const maintenance = this.totalCostData.maintenance.reduce((a,b)=>a+b,0);
-    const other = this.totalCostData.other.reduce((a,b)=>a+b,0);
-    return fuel + maintenance + other;
-  }
-
-  // --- Chart methods ---
-  createVehicleDistributionChart(): void {
-    const ctx = document.getElementById('vehicleDistributionChart') as HTMLCanvasElement;
-    new Chart(ctx, {
-      type: 'pie',
-      data: { labels: this.vehicleTypes, datasets: [{ data: this.vehicleDistributionData, backgroundColor: this.vehicleDistributionColors }] },
-      options: { responsive:true, plugins:{ title:{ display:true, text:'Répartition du parc' }, legend:{ position:'bottom' } } }
-    });
-  }
-
-  createFuelConsumptionChart(): void {
-    const ctx = document.getElementById('fuelConsumptionChart') as HTMLCanvasElement;
-    new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels:this.months,
-        datasets:[
-          {label:'Voiture', data:this.fuelConsumptionData.voiture, backgroundColor:'rgba(52, 152, 219,0.7)', borderColor:'rgba(52,152,219,1)', borderWidth:1},
-          {label:'Moto', data:this.fuelConsumptionData.moto, backgroundColor:'rgba(46,204,113,0.7)', borderColor:'rgba(46,204,113,1)', borderWidth:1},
-          {label:'Camion', data:this.fuelConsumptionData.camion, backgroundColor:'rgba(231,76,60,0.7)', borderColor:'rgba(231,76,60,1)', borderWidth:1},
-          {label:'Utilitaire', data:this.fuelConsumptionData.utilitaire, backgroundColor:'rgba(243,156,18,0.7)', borderColor:'rgba(243,156,18,1)', borderWidth:1}
-        ]
+  loadData() {
+    this.isLoading = true;
+    
+    forkJoin({
+      trajets: this.trajetService.getTrajets(),
+      carburants: this.carburantService.getCarburants(),
+      entretiens: this.entretienService.getEntretiens(),
+      vehicules: this.vehiculeService.getVehicules()
+    }).subscribe({
+      next: (results) => {
+        this.trajets = results.trajets;
+        this.carburants = results.carburants;
+        this.entretiens = results.entretiens;
+        this.vehicules = results.vehicules;
+        
+        this.hasData = this.trajets.length > 0 || this.carburants.length > 0 || this.entretiens.length > 0;
+        
+        if (this.hasData) {
+          this.calculateIndicators();
+          setTimeout(() => this.initCharts(), 100);
+        }
+        
+        this.isLoading = false;
       },
-      options:{
-        responsive:true,
-        plugins:{ title:{ display:true, text:'Consommation de carburant (L/mois)' } },
-        scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } }
+      error: (error) => {
+        console.error('Erreur lors du chargement des données:', error);
+        this.isLoading = false;
       }
     });
   }
 
-  createMaintenanceCostChart(): void {
-    const ctx = document.getElementById('maintenanceCostChart') as HTMLCanvasElement;
-    const sorted = [...this.maintenanceCosts].sort((a,b)=>b.cost-a.cost);
-    new Chart(ctx,{ type:'bar', data:{ labels:sorted.map(d=>d.vehicle), datasets:[{ label:"Coût d'entretien (€)", data:sorted.map(d=>d.cost), backgroundColor:'rgba(155,89,182,0.7)', borderColor:'rgba(155,89,182,1)', borderWidth:1 }] },
-      options:{ indexAxis:'y', responsive:true, plugins:{ title:{ display:true, text:'Coûts de maintenance' } }, scales:{ x:{ beginAtZero:true } } }
-    });
+  calculateRepartitionDepenses() {
+    const coutCarburant = this.carburants
+      .filter(c => c.coutTotal)
+      .reduce((sum, c) => sum + (c.coutTotal || 0), 0);
+    
+    const coutEntretien = this.entretiens
+      .filter(e => e.cout)
+      .reduce((sum, e) => sum + (e.cout || 0), 0);
+
+    this.repartitionDepenses = [
+      { 
+        label: 'Carburant', 
+        montant: coutCarburant, 
+        // couleur: '#0d6efd'
+        couleur: '#f9414499'
+      },
+      { 
+        label: 'Entretien', 
+        montant: coutEntretien, 
+        // couleur: '#198754'
+        couleur: '#f3722c99'
+      }
+    ].filter(item => item.montant > 0);
   }
 
-  createActivityRateChart(): void {
-    const ctx = document.getElementById('activityRateChart') as HTMLCanvasElement;
-    const sorted = [...this.activityRates].sort((a,b)=>b.trips-a.trips);
-    new Chart(ctx,{ type:'bar', data:{ labels:sorted.map(d=>d.vehicle), datasets:[{ label:'Nombre de trajets / mois', data:sorted.map(d=>d.trips), backgroundColor:'rgba(52,73,94,0.7)', borderColor:'rgba(52,73,94,1)', borderWidth:1 }] },
-      options:{ responsive:true, plugins:{ title:{ display:true, text:'Taux d\'activité' } }, scales:{ y:{ beginAtZero:true } } }
-    });
+  calculateIndicators() {
+    this.calculateUsageIndicators();
+    this.calculateTotalDepenses();
+    this.calculateRepartitionDepenses();
   }
 
-  createTotalCostChart(): void {
-    const ctx = document.getElementById('totalCostChart') as HTMLCanvasElement;
-    new Chart(ctx,{ type:'bar', data:{ labels:this.totalCostData.labels, datasets:[
-      { label:'Carburant', data:this.totalCostData.fuel, backgroundColor:'rgba(52,152,219,0.7)', borderColor:'rgba(52,152,219,1)', borderWidth:1 },
-      { label:'Maintenance', data:this.totalCostData.maintenance, backgroundColor:'rgba(231,76,60,0.7)', borderColor:'rgba(231,76,60,1)', borderWidth:1 },
-      { label:'Autres coûts', data:this.totalCostData.other, backgroundColor:'rgba(46,204,113,0.7)', borderColor:'rgba(46,204,113,1)', borderWidth:1 }
-    ] }, options:{ responsive:true, plugins:{ title:{ display:true, text:'Coût total de possession (TCO) - €/an' } }, scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } } } });
+  calculateUsageIndicators() {
+    if (this.trajets.length === 0) return;
+
+    // Calcul du total de kilomètres (inchangé)
+    this.totalKilometres = this.trajets
+      .filter(t => t.distanceParcourue)
+      .reduce((sum, t) => sum + (t.distanceParcourue || 0), 0);
+
+    // Moyenne journalière (inchangé)
+    const kmParJour: { [date: string]: number } = {};
+    this.trajets.forEach(t => {
+      if (t.date && t.distanceParcourue) {
+        const dateStr = new Date(t.date).toDateString();
+        kmParJour[dateStr] = (kmParJour[dateStr] || 0) + (t.distanceParcourue || 0);
+      }
+    });
+
+    const nbJours = Object.keys(kmParJour).length;
+    this.averageDailyKm = nbJours > 0 ? +(this.totalKilometres / nbJours).toFixed(1) : 0;
+
+    // MODIFICATION ICI : Véhicule le plus utilisé par NOMBRE DE TRAJETS
+    const trajetsParVehicule: { [id: string]: number } = {};
+    this.trajets.forEach(t => {
+      if (t.vehicule?._id) {
+        const id = t.vehicule._id;
+        trajetsParVehicule[id] = (trajetsParVehicule[id] || 0) + 1; // Compter le nombre de trajets
+      }
+    });
+
+    const topVeh = Object.entries(trajetsParVehicule).sort((a, b) => b[1] - a[1])[0];
+    if (topVeh) {
+      const vehicule = this.vehicules.find(v => v._id === topVeh[0]);
+      this.vehiculePlusUtilise = vehicule ?
+        `${vehicule.marque} ${vehicule.modele || ''}` : `Aucune`
+        // `${vehicule.marque} ${vehicule.modele || ''} (${vehicule.immatriculation}) - ${topVeh[1]} trajets`.trim() :
+        // `Véhicule ${topVeh[0]} - ${topVeh[1]} trajets`;
+    }
+  }
+
+  calculateTotalDepenses() {
+    const coutCarburant = this.carburants
+      .filter(c => c.coutTotal)
+      .reduce((sum, c) => sum + (c.coutTotal || 0), 0);
+    
+    const coutEntretien = this.entretiens
+      .filter(e => e.cout)
+      .reduce((sum, e) => sum + (e.cout || 0), 0);
+    
+    this.totalDepenses = coutCarburant + coutEntretien;
+  }
+
+  initCharts() {
+    this.destroyCharts();
+    
+    if (this.trajets.length > 0) {
+      this.createTrajetsChart();
+      this.createKmChart();
+      this.createTopVehiculesChart();
+    }
+    
+    if (this.carburants.length > 0) {
+      this.createRepartitionDepensesChart();
+    }
+    
+    if (this.carburants.length > 0 || this.entretiens.length > 0) {
+      this.createCoutsChart();
+    }
+  }
+
+  destroyCharts() {
+    this.charts.forEach(chart => chart.destroy());
+    this.charts = [];
+  }
+
+  getMonthlyData(): MonthlyData {
+    const monthlyData: { [key: string]: { distance: number; carburant: number; entretien: number } } = {};
+
+    // Initialiser les 6 derniers mois
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const key = date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+      months.push(key);
+      monthlyData[key] = { distance: 0, carburant: 0, entretien: 0 };
+    }
+
+    // Trajets
+    this.trajets.forEach(t => {
+      if (t.date && t.distanceParcourue) {
+        const date = new Date(t.date);
+        const key = date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+        if (monthlyData[key]) {
+          monthlyData[key].distance += t.distanceParcourue || 0;
+        }
+      }
+    });
+
+    // Carburants
+    this.carburants.forEach(c => {
+      if (c.date && c.coutTotal) {
+        const date = new Date(c.date);
+        const key = date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+        if (monthlyData[key]) {
+          monthlyData[key].carburant += c.coutTotal || 0;
+        }
+      }
+    });
+
+    // Entretiens
+    this.entretiens.forEach(e => {
+      if (e.date && e.cout) {
+        const date = new Date(e.date);
+        const key = date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+        if (monthlyData[key]) {
+          monthlyData[key].entretien += e.cout || 0;
+        }
+      }
+    });
+
+    return {
+      labels: months,
+      distances: months.map(m => monthlyData[m].distance),
+      coutCarburant: months.map(m => monthlyData[m].carburant),
+      coutEntretien: months.map(m => monthlyData[m].entretien)
+    };
+  }
+
+  createKmChart() {
+    if (!this.chartKmRef?.nativeElement) return;
+
+    const monthlyData = this.getMonthlyData();
+    const ctx = this.chartKmRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: monthlyData.labels,
+        datasets: [{
+          label: 'Distance parcourue (km)',
+          data: monthlyData.distances,
+          backgroundColor: '#f9414499', // rouge vif pastel
+          borderColor: '#f94144',
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Kilométrage mensuel',
+            font: { size: 16 }
+          },
+          legend: { display: false }
+        },
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            title: { display: true, text: 'Kilomètres' }
+          } 
+        }
+      }
+    });
+
+    this.charts.push(chart);
+  }
+
+  // Remplacer createCarburantChart par createRepartitionDepensesChart
+  createRepartitionDepensesChart() {
+    if (!this.chartCarburantRef?.nativeElement) return;
+
+    const ctx = this.chartCarburantRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const labels = this.repartitionDepenses.map(item => item.label);
+    const data = this.repartitionDepenses.map(item => item.montant);
+    // const backgroundColors = this.repartitionDepenses.map(item => item.couleur);
+    const backgroundColors = this.repartitionDepenses.map((_, i) => {
+      const palette = ['#f94144', '#f3722c', '#f5c6cb', '#842029'];
+      return palette[i % palette.length];
+    });
+
+    const chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: backgroundColors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Répartition globale des dépenses',
+            font: { size: 16, weight: 'bold' }
+          },
+          legend: { 
+            position: 'bottom',
+            labels: { padding: 20 }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed;
+                const total = data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${context.label}: ${value.toFixed(2)} € (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '50%'
+      }
+    });
+
+    this.charts.push(chart);
+  }
+
+  createCoutsChart() {
+    if (!this.chartCoutsRef?.nativeElement) return;
+
+    const monthlyData = this.getMonthlyData();
+    const ctx = this.chartCoutsRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: monthlyData.labels,
+        datasets: [
+          {
+            label: 'Carburant',
+            data: monthlyData.coutCarburant,
+            // backgroundColor: '#0d6efd99',
+            // borderColor: '#0d6efd',
+            backgroundColor: '#f9414499',
+            borderColor: '#f94144',
+            borderWidth: 1
+          },
+          {
+            label: 'Entretien',
+            data: monthlyData.coutEntretien,
+            // backgroundColor: '#19875499',
+            // borderColor: '#198754',
+            backgroundColor: '#f3722c99',
+            borderColor: '#f3722c',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Dépenses mensuelles (€)',
+            font: { size: 16 }
+          }
+        },
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            title: { display: true, text: 'Euros (€)' }
+          } 
+        }
+      }
+    });
+
+    this.charts.push(chart);
+  }
+
+  createTopVehiculesChart() {
+    if (!this.chartTopVehiculesRef?.nativeElement) return;
+
+    // MODIFICATION ICI : Compter le nombre de trajets par véhicule
+    const trajetsParVehicule: { [vehiculeId: string]: number } = {};
+    this.trajets.forEach(t => {
+      if (t.vehicule?._id) {
+        const id = t.vehicule._id;
+        trajetsParVehicule[id] = (trajetsParVehicule[id] || 0) + 1; // Compter le nombre de trajets
+      }
+    });
+
+    const top = Object.entries(trajetsParVehicule)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    if (top.length === 0) return;
+
+    const labels = top.map(([id]) => {
+      const vehicule = this.vehicules.find(v => v._id === id);
+      return vehicule ?
+        `${vehicule.marque} ${vehicule.immatriculation}`.trim() :
+        `Véhicule ${id}`;
+    });
+
+    const data = top.map(([_, count]) => count); // Utiliser le nombre de trajets
+
+    const ctx = this.chartTopVehiculesRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Nombre de trajets',
+          data,
+          backgroundColor: '#f9414499',
+          borderColor: '#f94144',
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: 'y',
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top véhicules les plus utilisés (par nombre de trajets)', // Modifier le titre
+            font: { size: 16 }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: { display: true, text: 'Nombre de trajets' } // Modifier l'axe
+          }
+        }
+      }
+    });
+
+    this.charts.push(chart);
+  }
+
+  createTrajetsChart() {
+    if (!this.chartTrajetsRef?.nativeElement) return;
+
+    const trajetsParJour: { [date: string]: number } = {};
+    this.trajets.forEach(t => {
+      if (t.date) {
+        const dateStr = new Date(t.date).toLocaleDateString('fr-FR');
+        trajetsParJour[dateStr] = (trajetsParJour[dateStr] || 0) + 1;
+      }
+    });
+
+    const labels = Object.keys(trajetsParJour)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+      .slice(-15); // Limiter aux 15 derniers jours
+
+    const data = labels.map(date => trajetsParJour[date]);
+
+    const ctx = this.chartTrajetsRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Nombre de trajets',
+          data,
+          // backgroundColor: '#20c99722',
+          // borderColor: '#20c997',
+          backgroundColor: '#f5c6cb22',
+          borderColor: '#f94144',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Nombre de trajets par jour',
+            font: { size: 16 }
+          }
+        },
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            title: { display: true, text: 'Nombre de trajets' }
+          } 
+        }
+      }
+    });
+
+    this.charts.push(chart);
   }
 }
+
