@@ -88,18 +88,6 @@
 
   <div *ngIf="!isLoading && hasData" class="row g-4">
 
-    <!-- Activité récente -->
-    <div class="col-12">
-      <div class="card border-0 shadow-sm h-100 chart-card">
-        <div class="card-header bg-white border-0">
-          <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Activité Récente</h5>
-        </div>
-        <div class="card-body">
-          <canvas #chartTrajets></canvas>
-        </div>
-      </div>
-    </div>
-
     <!-- Performance & Répartition -->
     <div class="col-lg-8 col-12">
       <div class="card border-0 shadow-sm h-100 chart-card">
@@ -152,6 +140,18 @@
         </div>
         <div class="card-body">
           <canvas #chartTopVehicules></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activité récente -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm h-100 chart-card">
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Activité Récente</h5>
+        </div>
+        <div class="card-body">
+          <canvas #chartTrajets></canvas>
         </div>
       </div>
     </div>
